@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Reflection Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F2;
+    --surface: #FDFCFA;
+    --surface2: #EFECE7;
+    --border: #E2DDD7;
+    --border2: #C9C3BA;
+    --text: #1A1917;
+    --text2: #6B6560;
+    --text3: #9C9590;
+    --accent: #2D5016;
+    --accent2: #EAF0E2;
+    --amber: #92400E;
+    --amber-bg: #FEF3C7;
+    --blue: #1E3A5F;
+    --blue-bg: #DBEAFE;
+    --red: #7F1D1D;
+    --red-bg: #FEE2E2;
+    --green: #14532D;
+    --green-bg: #DCFCE7;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+  .logo span { color: var(--text3); font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 400; margin-left: 10px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .role-badge {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: none;
+  }
+  .role-badge.pt { background: var(--blue-bg); color: var(--blue); }
+  .role-badge.te { background: var(--amber-bg); color: var(--amber); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── LANDING ── */
+  .landing-hero {
+    text-align: center;
+    padding: 4rem 0 3rem;
+  }
+  .landing-hero h1 {
+    font-family: 'Lora', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+  .landing-hero p { font-size: 15px; color: var(--text2); max-width: 420px; margin: 0 auto 2.5rem; }
+  .role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 540px; margin: 0 auto; }
+  .role-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .role-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .role-icon { font-size: 28px; margin-bottom: 12px; }
+  .role-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .role-card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+  /* ── EDUCATOR LOGIN ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    width: 100%;
+    max-width: 380px;
+    margin: 1rem;
+    border: 1px solid var(--border);
+  }
+  .modal h2 { font-family: 'Lora', serif; font-size: 18px; margin-bottom: 6px; }
+  .modal p { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+
+  /* ── FORM ELEMENTS ── */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  input[type=text], input[type=password], textarea, select {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--text3); }
+  textarea { resize: vertical; line-height: 1.7; }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #3a6b1e; border-color: #3a6b1e; }
+  .btn-primary:disabled { background: var(--border2); border-color: var(--border2); cursor: not-allowed; opacity: 0.7; }
+  .btn-sm { padding: 7px 14px; font-size: 13px; }
+  .btn-ghost { border-color: transparent; background: none; color: var(--text2); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-full { width: 100%; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 10px; padding: 3px; width: fit-content; margin-bottom: 14px; }
+  .tab { padding: 7px 16px; border-radius: 7px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+  /* ── API KEY BANNER ── */
+  .api-banner {
+    background: var(--amber-bg);
+    border: 1px solid #FDE68A;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--amber);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .api-banner a { color: var(--amber); font-weight: 600; }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+  .upload-zone:hover { border-color: var(--accent); background: var(--accent2); }
+  .upload-zone p { font-size: 13px; color: var(--text2); margin-top: 6px; }
+  .upload-zone small { font-size: 12px; color: var(--text3); }
+
+  /* ── LOADING ── */
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-block { display: none; text-align: center; padding: 2.5rem; }
+  .loading-block p { font-size: 14px; color: var(--text2); }
+  .loading-block small { font-size: 12px; color: var(--text3); display: block; margin-top: 4px; }
+
+  /* ── ALERT ── */
+  .alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 10px; display: none; }
+  .alert-error { background: var(--red-bg); color: var(--red); border: 1px solid #FECACA; }
+  .alert-success { background: var(--green-bg); color: var(--green); border: 1px solid #BBF7D0; }
+
+  /* ── ANALYSIS RESULTS ── */
+  .result-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 10px; }
+  .result-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 10px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .emotion-item { margin-bottom: 10px; }
+  .emotion-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .emotion-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .emotion-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .check-item { display: flex; gap: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 6px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; padding: 4px 11px; border-radius: 20px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .suggestion-item { padding: 11px 13px; background: var(--bg); border-radius: var(--radius-sm); margin-bottom: 8px; border: 1px solid var(--border); }
+  .suggestion-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .suggestion-detail { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .depth-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 11px; border-radius: 20px; margin-top: 8px; }
+  .depth-reason { font-size: 12px; color: var(--text2); margin-top: 5px; }
+
+  /* ── REFLECTION LIST (Educator) ── */
+  .reflection-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .reflection-item:hover { border-color: var(--border2); }
+  .reflection-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .reflection-item-name { font-size: 14px; font-weight: 600; }
+  .reflection-item-date { font-size: 12px; color: var(--text3); white-space: nowrap; }
+  .reflection-item-preview { font-size: 13px; color: var(--text2); margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .reflection-item-badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .status-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .status-badge.analyzed { background: var(--green-bg); color: var(--green); }
+  .status-badge.pending { background: var(--amber-bg); color: var(--amber); }
+  .status-badge.feedback { background: var(--blue-bg); color: var(--blue); }
+
+  /* ── DETAIL VIEW ── */
+  .detail-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+  .detail-nav h2 { font-family: 'Lora', serif; font-size: 20px; font-weight: 600; }
+  .reflection-text-display {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .feedback-display {
+    background: var(--blue-bg);
+    border: 1px solid #BFDBFE;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--blue);
+    white-space: pre-wrap;
+    margin-top: 8px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header { margin-bottom: 1.5rem; }
+  .page-header h1 { font-family: 'Lora', serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .page-header p { font-size: 13px; color: var(--text2); }
+
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .char-count { font-size: 12px; color: var(--text3); margin-left: auto; }
+  .empty-state { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
+
+  @media (max-width: 580px) {
+    .role-cards { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    header { padding: 0 1rem; }
+    .container { padding: 1.5rem 1rem 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Reflection Platform <span>Pre-service Teacher · Teacher Educator</span></div>
+  <div class="header-right">
+    <span class="role-badge" id="role-badge"></span>
+    <button class="btn btn-sm btn-ghost" id="btn-logout" style="display:none;" onclick="logout()">Log out</button>
+  </div>
+</header>
+
+<!-- EDUCATOR PASSWORD MODAL -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <h2>Educator Access</h2>
+    <p>Enter the educator password to continue.</p>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="edu-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkEducatorPass()">
+    </div>
+    <div class="alert alert-error" id="pass-error">Incorrect password. Please try again.</div>
+    <div style="display:flex; gap:8px; margin-top:14px;">
+      <button class="btn btn-full" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-full" onclick="checkEducatorPass()">Enter</button>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="modal-apikey">
+  <div class="modal">
+    <h2>API Key Required</h2>
+    <p>Enter your Anthropic API key to enable AI analysis. It will be saved in this browser only.</p>
+    <div class="field">
+      <label>Anthropic API Key</label>
+      <input type="password" id="modal-key-input" placeholder="sk-ant-api03-...">
+    </div>
+    <p style="font-size:12px; color:var(--text3); margin-top:-8px; margin-bottom:14px;">
+      Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);">console.anthropic.com</a>
+    </p>
+    <div class="alert alert-error" id="key-error"></div>
+    <div style="display:flex; gap:8px; margin-top:14px;">
+      <button class="btn btn-full" onclick="closeApiModal()">Cancel</button>
+      <button class="btn btn-primary btn-full" onclick="saveApiKey()">Save & Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: LANDING -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page active" id="page-landing">
+  <div class="container">
+    <div class="landing-hero">
+      <h1>Teacher Reflection<br>Analysis Platform</h1>
+      <p>A space for pre-service teachers to reflect and grow, supported by AI analysis and educator feedback.</p>
+      <div class="role-cards">
+        <div class="role-card" onclick="enterAs('preservice')">
+          <div class="role-icon">✏️</div>
+          <h3>Pre-service Teacher</h3>
+          <p>Submit your teaching reflection and receive AI-powered feedback.</p>
+        </div>
+        <div class="role-card" onclick="enterAs('educator')">
+          <div class="role-icon">🎓</div>
+          <h3>Teacher Educator</h3>
+          <p>Review submitted reflections, AI analyses, and provide personal feedback.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: PRE-SERVICE TEACHER -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-preservice">
+  <div class="container">
+
+    <div class="page-header">
+      <h1>Submit Your Reflection</h1>
+      <p>Write about your teaching experience. AI will analyze your reflection and your educator will provide feedback.</p>
+    </div>
+
+    <!-- Reflection form -->
+    <div class="card">
+      <div class="card-title">Your Information</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field" style="margin:0;">
+          <label>Your Name</label>
+          <input type="text" id="pt-name" placeholder="e.g. Jane Smith">
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Course / Class</label>
+          <input type="text" id="pt-course" placeholder="e.g. Math 101">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reflection Content</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchPTTab('text')">Type</button>
+        <button class="tab" onclick="switchPTTab('file')">Upload File</button>
+      </div>
+
+      <div id="pt-tab-text">
+        <textarea id="pt-reflection" rows="9"
+          placeholder="Describe your teaching experience — what went well, what was challenging, what you noticed about student engagement, and what you would do differently..."
+          oninput="document.getElementById('pt-char').textContent=this.value.length+'  chars'"></textarea>
+      </div>
+      <div id="pt-tab-file" style="display:none;">
+        <div class="upload-zone" onclick="document.getElementById('pt-file').click()">
+          <div style="font-size:28px;">📄</div>
+          <p>Click to select a file</p>
+          <small>.pdf · .docx · .txt supported</small>
+          <input type="file" id="pt-file" accept=".pdf,.docx,.txt" style="display:none;" onchange="handlePTFile(event)">
+        </div>
+        <div class="alert alert-success" id="pt-file-info" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn btn-primary" id="pt-submit-btn" onclick="submitReflection()">Submit & Analyze</button>
+        <button class="btn btn-ghost" onclick="clearPTForm()">Clear</button>
+        <span class="char-count" id="pt-char"></span>
+      </div>
+      <div class="alert alert-error" id="pt-error"></div>
+      <div class="alert alert-success" id="pt-success"></div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-block" id="pt-loading">
+      <div class="spinner"></div>
+      <p>Analyzing your reflection...</p>
+      <small>This usually takes 15–25 seconds</small>
+    </div>
+
+    <!-- Results -->
+    <div id="pt-results" style="display:none;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:1rem; padding-bottom:12px; border-bottom:1px solid var(--border);">
+        <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;"></span>
+        <span style="font-size:15px; font-weight:600; font-family:'Lora',serif;">Analysis Complete</span>
+      </div>
+      <div id="pt-results-content"></div>
+
+      <!-- Educator feedback section -->
+      <div class="card" id="pt-feedback-section" style="display:none; border-left:3px solid #2563EB;">
+        <div class="card-title">💬 Educator Feedback</div>
+        <div class="feedback-display" id="pt-feedback-text"></div>
+      </div>
+    </div>
+
+    <!-- My previous submissions -->
+    <div class="divider"></div>
+    <div class="page-header">
+      <h1 style="font-size:18px;">My Previous Submissions</h1>
+    </div>
+    <div id="pt-history"></div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: EDUCATOR DASHBOARD -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-educator">
+  <div class="container">
+
+    <div class="page-header">
+      <h1>Educator Dashboard</h1>
+      <p>Review pre-service teacher reflections, AI analyses, and provide your feedback.</p>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+      <span style="font-size:13px; color:var(--text2);" id="edu-count">Loading submissions...</span>
+      <button class="btn btn-sm" onclick="loadReflections()">↻ Refresh</button>
+    </div>
+
+    <div id="edu-list"></div>
+
+    <!-- Detail panel -->
+    <div id="edu-detail" style="display:none;">
+      <div class="detail-nav">
+        <button class="btn btn-sm btn-ghost" onclick="closeDetail()">← Back</button>
+        <h2 id="detail-title">Reflection</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Submitted Reflection</div>
+        <div style="display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
+          <span style="font-size:13px; color:var(--text2);">👤 <strong id="detail-name"></strong></span>
+          <span style="font-size:13px; color:var(--text2);">📚 <strong id="detail-course"></strong></span>
+          <span style="font-size:13px; color:var(--text2);">🗓 <strong id="detail-date"></strong></span>
+        </div>
+        <div class="reflection-text-display" id="detail-reflection"></div>
+      </div>
+
+      <div id="detail-analysis-block" style="display:none;">
+        <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">AI Analysis</div>
+        <div id="detail-analysis-content"></div>
+      </div>
+
+      <div id="detail-no-analysis" class="card" style="display:none; text-align:center; color:var(--text2); font-size:14px;">
+        No AI analysis yet.
+        <div style="margin-top:10px;">
+          <button class="btn btn-sm btn-primary" onclick="reanalyze()">Run AI Analysis Now</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <div class="card-title">Your Feedback to Pre-service Teacher</div>
+        <div id="existing-feedback" style="display:none; margin-bottom:12px;">
+          <div style="font-size:12px; color:var(--text2); margin-bottom:6px;">Previously submitted feedback:</div>
+          <div class="feedback-display" id="existing-feedback-text"></div>
+          <div style="margin-top:8px;"><button class="btn btn-sm" onclick="editFeedback()">Edit Feedback</button></div>
+        </div>
+        <div id="feedback-form">
+          <textarea id="edu-feedback" rows="6" placeholder="Write your personal feedback here. Consider the AI analysis above and add your professional insights, encouragement, and specific suggestions..."></textarea>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('edu-feedback').value=''">Clear</button>
+          </div>
+          <div class="alert alert-error" id="edu-feedback-error"></div>
+          <div class="alert alert-success" id="edu-feedback-success"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Firebase + App Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA7wRoo8ma69Cy8cXnXJKeOSvWDmqCo5uY",
+  authDomain: "teacher-reflection-analysis.firebaseapp.com",
+  projectId: "teacher-reflection-analysis",
+  storageBucket: "teacher-reflection-analysis.firebasestorage.app",
+  messagingSenderId: "411108923441",
+  appId: "1:411108923441:web:af3fbf497109b6bcd09d10"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ── EDUCATOR PASSWORD (change this!) ──
+const EDUCATOR_PASS = "educator2025";
+
+// ── STATE ──
+let currentRole = null;
+let currentDetailId = null;
+let currentDetailData = null;
+let ptUploadedFile = null;
+let ptFileContent = '';
+let ptCurrentTab = 'text';
+
+// ── UTILS ──
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function showFlex(id) { document.getElementById(id).style.display = 'flex'; }
+function showAlert(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
+function hideAlert(id) { document.getElementById(id).style.display = 'none'; }
+
+function getApiKey() { return localStorage.getItem('anthropic_key') || ''; }
+
+function formatDate(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+// ── API KEY MODAL ──
+window.openApiModal = () => showFlex('modal-apikey');
+window.closeApiModal = () => hide('modal-apikey');
+window.saveApiKey = () => {
+  const key = document.getElementById('modal-key-input').value.trim();
+  if (!key.startsWith('sk-ant-')) { showAlert('key-error', 'Invalid key format. Must start with sk-ant-'); return; }
+  localStorage.setItem('anthropic_key', key);
+  hide('modal-apikey');
+  updateApiBanners();
+};
+
+function updateApiBanners() {
+  const key = getApiKey();
+  if (key) {
+    hide('api-banner-pt');
+    hide('api-banner-edu');
+  } else {
+    show('api-banner-pt');
+    show('api-banner-edu');
+  }
+}
+
+// ── ROLE SELECTION ──
+window.enterAs = (role) => {
+  if (role === 'educator') {
+    showFlex('modal-login');
+    return;
+  }
+  setRole('preservice');
+};
+
+window.checkEducatorPass = () => {
+  const val = document.getElementById('edu-password').value;
+  if (val === EDUCATOR_PASS) {
+    hide('modal-login');
+    document.getElementById('edu-password').value = '';
+    hideAlert('pass-error');
+    setRole('educator');
+  } else {
+    showAlert('pass-error', 'Incorrect password. Please try again.');
+  }
+};
+
+window.closeModal = () => {
+  hide('modal-login');
+  document.getElementById('edu-password').value = '';
+  hideAlert('pass-error');
+};
+
+function setRole(role) {
+  currentRole = role;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + (role === 'preservice' ? 'preservice' : 'educator')).classList.add('active');
+  const badge = document.getElementById('role-badge');
+  badge.style.display = 'inline-block';
+  badge.className = 'role-badge ' + (role === 'preservice' ? 'pt' : 'te');
+  badge.textContent = role === 'preservice' ? 'Pre-service Teacher' : 'Teacher Educator';
+  document.getElementById('btn-logout').style.display = 'inline-block';
+  updateApiBanners();
+  if (role === 'educator') loadReflections();
+  if (role === 'preservice') loadPTHistory();
+}
+
+window.logout = () => {
+  currentRole = null;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-landing').classList.add('active');
+  document.getElementById('role-badge').style.display = 'none';
+  document.getElementById('btn-logout').style.display = 'none';
+};
+
+// ── PRE-SERVICE TEACHER ──
+window.switchPTTab = (tab) => {
+  ptCurrentTab = tab;
+  document.querySelectorAll('#page-preservice .tab').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='text')||(i===1&&tab==='file')));
+  document.getElementById('pt-tab-text').style.display = tab === 'text' ? 'block' : 'none';
+  document.getElementById('pt-tab-file').style.display = tab === 'file' ? 'block' : 'none';
+};
+
+window.handlePTFile = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  ptUploadedFile = file;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'txt') {
+    ptFileContent = await file.text();
+    showAlert('pt-file-info', '✓ File loaded: ' + file.name);
+  } else {
+    ptFileContent = '__binary__';
+    showAlert('pt-file-info', '✓ File ready: ' + file.name + ' (AI will read directly)');
+  }
+};
+
+window.clearPTForm = () => {
+  document.getElementById('pt-name').value = '';
+  document.getElementById('pt-course').value = '';
+  document.getElementById('pt-reflection').value = '';
+  document.getElementById('pt-char').textContent = '';
+  document.getElementById('pt-file-info').style.display = 'none';
+  document.getElementById('pt-file').value = '';
+  document.getElementById('pt-results').style.display = 'none';
+  hideAlert('pt-error');
+  hideAlert('pt-success');
+  ptUploadedFile = null;
+  ptFileContent = '';
+};
+
+window.submitReflection = async () => {
+  const name = document.getElementById('pt-name').value.trim();
+  const course = document.getElementById('pt-course').value.trim();
+  let reflectionText = '';
+
+  if (ptCurrentTab === 'text') {
+    reflectionText = document.getElementById('pt-reflection').value.trim();
+  } else {
+    reflectionText = ptFileContent !== '__binary__' ? ptFileContent : '';
+  }
+
+  if (!name) { showAlert('pt-error', 'Please enter your name.'); return; }
+  if (!reflectionText && !ptUploadedFile) { showAlert('pt-error', 'Please enter or upload your reflection.'); return; }
+  hideAlert('pt-error');
+
+  document.getElementById('pt-submit-btn').disabled = true;
+  show('pt-loading');
+  hide('pt-results');
+
+  try {
+    // Run AI analysis
+    const analysis = await runAnalysis(reflectionText, ptUploadedFile && ptFileContent === '__binary__' ? ptUploadedFile : null);
+
+    // Save to Firestore
+    const docRef = await addDoc(collection(db, 'reflections'), {
+      name,
+      course,
+      reflectionText: reflectionText || '[File upload]',
+      analysis,
+      feedback: '',
+      submittedAt: new Date()
+    });
+
+    // Show results
+    renderPTResults(analysis);
+    showAlert('pt-success', '✓ Reflection submitted successfully! Your educator will review it soon.');
+    loadPTHistory();
+  } catch (err) {
+    showAlert('pt-error', 'Error: ' + err.message);
+  } finally {
+    hide('pt-loading');
+    document.getElementById('pt-submit-btn').disabled = false;
+  }
+};
+
+async function loadPTHistory() {
+  const name = document.getElementById('pt-name').value.trim();
+  if (!name) { document.getElementById('pt-history').innerHTML = '<div class="empty-state">Enter your name above to see your previous submissions.</div>'; return; }
+  try {
+    const q = query(collection(db, 'reflections'), where('name', '==', name), orderBy('submittedAt', 'desc'));
+    const snap = await getDocs(q);
+    if (snap.empty) { document.getElementById('pt-history').innerHTML = '<div class="empty-state">No previous submissions found.</div>'; return; }
+    let html = '';
+    snap.forEach(d => {
+      const data = d.data();
+      html += `<div class="reflection-item" onclick="viewPTSubmission('${d.id}')">
+        <div class="reflection-item-header">
+          <span class="reflection-item-name">${data.course || 'No course'}</span>
+          <span class="reflection-item-date">${formatDate(data.submittedAt)}</span>
+        </div>
+        <div class="reflection-item-preview">${data.reflectionText}</div>
+        <div class="reflection-item-badges">
+          <span class="status-badge analyzed">AI Analyzed</span>
+          ${data.feedback ? '<span class="status-badge feedback">Educator Feedback</span>' : ''}
+        </div>
+      </div>`;
+    });
+    document.getElementById('pt-history').innerHTML = html;
+  } catch(e) {
+    document.getElementById('pt-history').innerHTML = '<div class="empty-state">Could not load history.</div>';
+  }
+}
+
+window.viewPTSubmission = async (id) => {
+  // Just scroll to results — full detail view is for educator
+  // For preservice teacher, show a summary modal or just scroll
+};
+
+// ── EDUCATOR ──
+window.loadReflections = async () => {
+  closeDetail();
+  document.getElementById('edu-count').textContent = 'Loading...';
+  document.getElementById('edu-list').innerHTML = '';
+  try {
+    const q = query(collection(db, 'reflections'), orderBy('submittedAt', 'desc'));
+    const snap = await getDocs(q);
+    document.getElementById('edu-count').textContent = snap.size + ' submission' + (snap.size !== 1 ? 's' : '');
+    if (snap.empty) { document.getElementById('edu-list').innerHTML = '<div class="empty-state">No submissions yet.</div>'; return; }
+    let html = '';
+    snap.forEach(d => {
+      const data = d.data();
+      html += `<div class="reflection-item" onclick="openDetail('${d.id}')">
+        <div class="reflection-item-header">
+          <span class="reflection-item-name">${data.name}</span>
+          <span class="reflection-item-date">${formatDate(data.submittedAt)}</span>
+        </div>
+        <div class="reflection-item-preview">${data.reflectionText}</div>
+        <div class="reflection-item-badges">
+          <span class="status-badge ${data.analysis ? 'analyzed' : 'pending'}">${data.analysis ? 'AI Analyzed' : 'Pending Analysis'}</span>
+          ${data.feedback ? '<span class="status-badge feedback">Feedback Given</span>' : ''}
+          ${data.course ? '<span class="tag">' + data.course + '</span>' : ''}
+        </div>
+      </div>`;
+    });
+    document.getElementById('edu-list').innerHTML = html;
+  } catch(e) {
+    document.getElementById('edu-list').innerHTML = '<div class="empty-state">Error loading submissions: ' + e.message + '</div>';
+  }
+};
+
+window.openDetail = async (id) => {
+  const snap = await getDocs(collection(db, 'reflections'));
+  snap.forEach(d => {
+    if (d.id === id) {
+      currentDetailId = id;
+      currentDetailData = d.data();
+    }
+  });
+  if (!currentDetailData) return;
+  const data = currentDetailData;
+
+  hide('edu-list');
+  document.getElementById('edu-count').style.display = 'none';
+  document.querySelector('#page-educator > .container > div:nth-child(3)').style.display = 'none'; // refresh row
+  show('edu-detail');
+
+  document.getElementById('detail-title').textContent = data.name + "'s Reflection";
+  document.getElementById('detail-name').textContent = data.name;
+  document.getElementById('detail-course').textContent = data.course || '—';
+  document.getElementById('detail-date').textContent = formatDate(data.submittedAt);
+  document.getElementById('detail-reflection').textContent = data.reflectionText;
+
+  if (data.analysis) {
+    show('detail-analysis-block');
+    hide('detail-no-analysis');
+    document.getElementById('detail-analysis-content').innerHTML = renderAnalysisHTML(data.analysis);
+  } else {
+    hide('detail-analysis-block');
+    show('detail-no-analysis');
+  }
+
+  if (data.feedback) {
+    show('existing-feedback');
+    hide('feedback-form');
+    document.getElementById('existing-feedback-text').textContent = data.feedback;
+  } else {
+    hide('existing-feedback');
+    show('feedback-form');
+    document.getElementById('edu-feedback').value = '';
+  }
+  hideAlert('edu-feedback-error');
+  hideAlert('edu-feedback-success');
+};
+
+window.closeDetail = () => {
+  hide('edu-detail');
+  show('edu-list');
+  document.getElementById('edu-count').style.display = 'block';
+  const refreshRow = document.querySelector('#page-educator > .container > div:nth-child(3)');
+  if (refreshRow) refreshRow.style.display = 'flex';
+  currentDetailId = null;
+  currentDetailData = null;
+};
+
+window.reanalyze = async () => {
+  if (!currentDetailData) return;
+  document.querySelector('#detail-no-analysis button').disabled = true;
+  document.querySelector('#detail-no-analysis button').textContent = 'Analyzing...';
+  try {
+    const analysis = await runAnalysis(currentDetailData.reflectionText, null);
+    await updateDoc(doc(db, 'reflections', currentDetailId), { analysis });
+    currentDetailData.analysis = analysis;
+    show('detail-analysis-block');
+    hide('detail-no-analysis');
+    document.getElementById('detail-analysis-content').innerHTML = renderAnalysisHTML(analysis);
+  } catch(e) {
+    alert('Analysis failed: ' + e.message);
+  }
+};
+
+window.submitFeedback = async () => {
+  const fb = document.getElementById('edu-feedback').value.trim();
+  if (!fb) { showAlert('edu-feedback-error', 'Please write your feedback before submitting.'); return; }
+  hideAlert('edu-feedback-error');
+  try {
+    await updateDoc(doc(db, 'reflections', currentDetailId), { feedback: fb });
+    showAlert('edu-feedback-success', '✓ Feedback submitted successfully!');
+    setTimeout(() => {
+      document.getElementById('existing-feedback-text').textContent = fb;
+      show('existing-feedback');
+      hide('feedback-form');
+      hideAlert('edu-feedback-success');
+    }, 1500);
+  } catch(e) {
+    showAlert('edu-feedback-error', 'Error: ' + e.message);
+  }
+};
+
+window.editFeedback = () => {
+  document.getElementById('edu-feedback').value = document.getElementById('existing-feedback-text').textContent;
+  hide('existing-feedback');
+  show('feedback-form');
+};
+
+// ── AI ANALYSIS ──
+async function runAnalysis(text, binaryFile) {
+  const system = `You are an expert teacher educator analyzing pre-service teacher reflections. Respond ONLY with valid JSON — no markdown, no explanation, just raw JSON.
+
+{
+  "summary": "2-3 sentence summary of the reflection",
+  "emotions": [
+    {"label": "emotion name", "score": 0-100, "color": "#hex"}
+  ],
+  "attitude": "2-3 sentences describing the teacher's overall attitude and professional stance",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "improvements": ["area for improvement 1", "area for improvement 2"],
+  "themes": ["theme 1", "theme 2", "theme 3", "theme 4"],
+  "suggestions": [
+    {"title": "suggestion title", "detail": "specific actionable advice"}
+  ],
+  "reflection_depth": "Surface-level or Descriptive or Critical or Transformative",
+  "reflection_depth_reason": "One sentence explaining the depth rating"
+}
+
+Emotion colors: positive=#16A34A, negative=#DC2626, neutral=#2563EB, mixed=#D97706`;
+
+  let body;
+  if (binaryFile) {
+    const b64 = await toBase64(binaryFile);
+    const ext = binaryFile.name.split('.').pop().toLowerCase();
+    const mt = ext === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    body = {
+      model: 'claude-sonnet-4-5', max_tokens: 1200, system,
+      messages: [{role:'user', content:[
+        {type:'document', source:{type:'base64', media_type: mt, data: b64}},
+        {type:'text', text:'Analyze this pre-service teacher reflection.'}
+      ]}]
+    };
+  } else {
+    body = {
+      model: 'claude-sonnet-4-5', max_tokens: 1200, system,
+      messages: [{role:'user', content: 'Analyze this pre-service teacher reflection:\n\n' + text}]
+    };
+  }
+
+  const res = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'API error ' + res.status);
+  }
+
+  const data = await res.json();
+  const raw = data.content.map(b => b.text||'').join('');
+  return JSON.parse(raw.replace(/```json|```/g,'').trim());
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('File read failed'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ── RENDER RESULTS ──
+function depthStyle(d) {
+  const m = {
+    'Surface-level': {bg:'#FEE2E2',color:'#7F1D1D'},
+    'Descriptive':   {bg:'#FEF3C7',color:'#92400E'},
+    'Critical':      {bg:'#DBEAFE',color:'#1E3A5F'},
+    'Transformative':{bg:'#DCFCE7',color:'#14532D'}
+  };
+  return m[d] || {bg:'#F3F4F6',color:'#374151'};
+}
+
+function renderAnalysisHTML(d) {
+  const ds = depthStyle(d.reflection_depth);
+  let html = '';
+
+  html += `<div class="result-block">
+    <div class="result-label">Summary</div>
+    <p style="font-size:14px;line-height:1.75;">${d.summary}</p>
+    <span class="depth-badge" style="background:${ds.bg};color:${ds.color};">${d.reflection_depth}</span>
+    <p class="depth-reason">${d.reflection_depth_reason}</p>
+  </div>`;
+
+  html += `<div class="result-block">
+    <div class="result-label">Emotions & Attitude</div>
+    ${d.emotions.map(e=>`
+      <div class="emotion-item">
+        <div class="emotion-header"><span style="font-size:13px;font-weight:500;">${e.label}</span><span style="font-size:12px;color:var(--text3);">${e.score}%</span></div>
+        <div class="emotion-bar"><div class="emotion-fill" style="width:${e.score}%;background:${e.color};"></div></div>
+      </div>`).join('')}
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">${d.attitude}</p>
+  </div>`;
+
+  html += `<div class="two-col">
+    <div class="result-block">
+      <div class="result-label">Strengths</div>
+      ${d.strengths.map(s=>`<div class="check-item"><span style="color:#16A34A;">✓</span><span>${s}</span></div>`).join('')}
+    </div>
+    <div class="result-block">
+      <div class="result-label">Areas for Growth</div>
+      ${d.improvements.map(i=>`<div class="check-item"><span style="color:#D97706;">△</span><span>${i}</span></div>`).join('')}
+    </div>
+  </div>`;
+
+  html += `<div class="result-block">
+    <div class="result-label">Key Themes</div>
+    <div class="tags">${d.themes.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+  </div>`;
+
+  html += `<div class="result-block">
+    <div class="result-label">Suggestions for Development</div>
+    ${d.suggestions.map((s,i)=>`
+      <div class="suggestion-item">
+        <div class="suggestion-title">${i+1}. ${s.title}</div>
+        <div class="suggestion-detail">${s.detail}</div>
+      </div>`).join('')}
+  </div>`;
+
+  return html;
+}
+
+function renderPTResults(d) {
+  document.getElementById('pt-results-content').innerHTML = renderAnalysisHTML(d);
+  show('pt-results');
+  document.getElementById('pt-results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// expose globals
+window.loadReflections = loadReflections;
+window.openApiModal = openApiModal;
+
+// init
+updateApiBanners();
+</script>
+</body>
+</html>
